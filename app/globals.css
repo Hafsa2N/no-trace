@@ -1,26 +1,77 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #fafafa;
+  --surface: #ffffff;
+  --foreground: #0f172a;
+  --muted: #64748b;
+  --border: #e2e8f0;
+
+  --primary: #4f46e5;
+  --primary-hover: #4338ca;
+  --primary-light: #eef2ff;
+
+  --accent: #059669;
+  --accent-light: #ecfdf5;
+
+  --danger: #dc2626;
+  --danger-light: #fef2f2;
 }
 
 @theme inline {
   --color-background: var(--background);
+  --color-surface: var(--surface);
   --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-light: var(--primary-light);
+
+  --color-accent: var(--accent);
+  --color-accent-light: var(--accent-light);
+
+  --color-danger: var(--danger);
+  --color-danger-light: var(--danger-light);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #0a0a12;
+    --surface: #12121e;
+    --foreground: #e6e8f0;
+    --muted: #8b92a8;
+    --border: #22222f;
+
+    --primary: #818cf8;
+    --primary-hover: #a5b4fc;
+    --primary-light: #1e1b4b;
+
+    --accent: #34d399;
+    --accent-light: #052e21;
+
+    --danger: #f87171;
+    --danger-light: #2c1212;
   }
+}
+
+* {
+  border-color: var(--border);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Subtle brand wash used behind hero/auth sections */
+.bg-hero {
+  background:
+    radial-gradient(60% 50% at 15% 0%, var(--primary-light), transparent 60%),
+    radial-gradient(50% 40% at 100% 0%, var(--accent-light), transparent 55%);
 }
