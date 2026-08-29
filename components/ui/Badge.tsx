@@ -1,12 +1,13 @@
 import { HTMLAttributes } from "react";
 
-type Tone = "neutral" | "success" | "warning" | "primary";
+type Tone = "neutral" | "success" | "warning" | "primary" | "danger";
 
 const tones: Record<Tone, string> = {
-  neutral: "bg-slate-100 text-slate-600 dark:bg-white/5 dark:text-slate-300",
+  neutral: "bg-border/40 text-foreground",
   success: "bg-accent-light text-accent",
-  warning: "bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400",
+  warning: "bg-warning-light text-warning",
   primary: "bg-primary-light text-primary",
+  danger: "bg-danger-light text-danger",
 };
 
 export function Badge({

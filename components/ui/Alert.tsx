@@ -12,7 +12,10 @@ const config: Record<Tone, { className: string; icon: typeof CheckCircle2 }> = {
 export function Alert({ tone, children }: { tone: Tone; children: ReactNode }) {
   const { className, icon: Icon } = config[tone];
   return (
-    <div className={`flex items-start gap-2.5 rounded-lg border px-3.5 py-3 text-sm ${className}`}>
+    <div
+      className={`flex items-start gap-2.5 rounded-lg border px-3.5 py-3 text-sm ${className}`}
+      role={tone === "error" ? "alert" : "status"}
+    >
       <Icon className="mt-0.5 h-4 w-4 shrink-0" />
       <span>{children}</span>
     </div>

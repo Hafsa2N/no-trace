@@ -1,21 +1,34 @@
 @import "tailwindcss";
 
+/* The same palette as the public homepage (components/homepage), extended
+   to the whole app through these tokens instead of restyling every page —
+   existing components already read color exclusively through
+   bg-primary/text-foreground/etc., so changing the values here is what
+   "applies the theme site-wide" without touching component markup.
+   Warm cream ground, ink text, coral as the one spent brand color, teal
+   as the secondary/accent — not the generic indigo-on-off-white SaaS
+   default this app started with. */
 :root {
-  --background: #fafafa;
-  --surface: #ffffff;
-  --foreground: #0f172a;
-  --muted: #64748b;
-  --border: #e2e8f0;
+  --background: #fdf4ec;
+  --surface: #fff9f2;
+  --foreground: #241a2e;
+  --muted: #7a6156;
+  --border: #e8d2bc;
 
-  --primary: #4f46e5;
-  --primary-hover: #4338ca;
-  --primary-light: #eef2ff;
+  --primary: #ff4b33;
+  --primary-hover: #e23a20;
+  --primary-light: #f8e7d6;
 
-  --accent: #059669;
-  --accent-light: #ecfdf5;
+  --accent: #0e8f86;
+  --accent-light: #dceeec;
 
-  --danger: #dc2626;
-  --danger-light: #fef2f2;
+  --danger: #c23b3b;
+  --danger-light: #fbeeee;
+
+  /* Formal warning status — previously scattered as ad hoc amber Tailwind
+     utility classes; now a real token so status coding is consistent. */
+  --warning: #b3790a;
+  --warning-light: #faf1de;
 }
 
 @theme inline {
@@ -35,27 +48,34 @@
   --color-danger: var(--danger);
   --color-danger-light: var(--danger-light);
 
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-warning: var(--warning);
+  --color-warning-light: var(--warning-light);
+
+  --font-sans: var(--font-body);
+  --font-mono: var(--font-mono-nt);
+  --font-display: var(--font-display);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a12;
-    --surface: #12121e;
-    --foreground: #e6e8f0;
-    --muted: #8b92a8;
-    --border: #22222f;
+    --background: #150f1a;
+    --surface: #1e1522;
+    --foreground: #f4efe6;
+    --muted: #a99184;
+    --border: #33242f;
 
-    --primary: #818cf8;
-    --primary-hover: #a5b4fc;
-    --primary-light: #1e1b4b;
+    --primary: #ff6b52;
+    --primary-hover: #ff8267;
+    --primary-light: #3d2018;
 
-    --accent: #34d399;
-    --accent-light: #052e21;
+    --accent: #1fbbaf;
+    --accent-light: #0f2e2b;
 
-    --danger: #f87171;
-    --danger-light: #2c1212;
+    --danger: #e5807f;
+    --danger-light: #341c1c;
+
+    --warning: #e0ab4a;
+    --warning-light: #332a15;
   }
 }
 
@@ -63,15 +83,122 @@
   border-color: var(--border);
 }
 
+/* A flat solid background reads as an untouched template — real product
+   sites almost never use one, even on a light theme (Stripe layers 25+
+   gradient elements and an animated mesh canvas into an otherwise light
+   page; Linear commits to near-black; Ruttl runs a looping video behind
+   its hero). A faint grain texture is the lightest-touch way to add that
+   same "considered surface" quality everywhere, not just in the hero —
+   subtle enough to be invisible as a texture and only felt as "this
+   doesn't look like a bare browser default." */
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+  background-repeat: repeat;
 }
 
 /* Subtle brand wash used behind hero/auth sections */
 .bg-hero {
   background:
     radial-gradient(60% 50% at 15% 0%, var(--primary-light), transparent 60%),
-    radial-gradient(50% 40% at 100% 0%, var(--accent-light), transparent 55%);
+    radial-gradient(50% 40% at 100% 0%, var(--accent-light), transparent 55%),
+    radial-gradient(40% 35% at 50% 100%, var(--accent-light), transparent 60%);
+}
+
+/* Faint dot grid — used behind sections that want a sense of structure
+   without competing with content on top of it (dashboards, stat rows). */
+.bg-grid {
+  background-image: radial-gradient(var(--border) 1px, transparent 1px);
+  background-size: 22px 22px;
+  -webkit-mask-image: linear-gradient(to bottom, black, transparent);
+  mask-image: linear-gradient(to bottom, black, transparent);
+}
+
+/* Applied to whichever step is currently showing in a multi-step flow
+   (student verification, setup, forgot-password) so switching steps reads
+   as a deliberate transition instead of an instant content swap. */
+@keyframes step-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-step-in {
+  animation: step-in 0.25s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-step-in {
+    animation: none;
+  }
+}
+
+/* Infinite horizontal scroll for marquee ticker strips (login panel,
+   public homepage) — duplicate the content once and translate by exactly
+   half its width so the loop seam is invisible. */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  [class*="animate-[marquee"] {
+    animation: none;
+  }
+}
+
+/* Magnitude bars (ratings, MCQ distributions) grow from 0 to their real
+   value on first paint instead of appearing already-filled — the chart
+   communicating "this is a measurement," not decoration. The target width
+   is set per-instance via the --bar-width custom property. */
+@keyframes bar-grow {
+  from {
+    width: 0;
+  }
+  to {
+    width: var(--bar-width);
+  }
+}
+.animate-bar-grow {
+  animation: bar-grow 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-bar-grow {
+    animation: none;
+    width: var(--bar-width);
+  }
+}
+
+/* The one signature brand moment: a soft ring emanates from the wordmark's
+   dot and fades — a signal announcing presence while resolving to nothing,
+   the same idea the whole product is built on. Applied to the existing
+   brand dot everywhere it already appears (this is restraint, not a new
+   decorative element) rather than invented only for one page. */
+@keyframes signal-ping {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary) 45%, transparent);
+  }
+  70% {
+    box-shadow: 0 0 0 7px color-mix(in srgb, var(--primary) 0%, transparent);
+  }
+  100% {
+    box-shadow: 0 0 0 7px color-mix(in srgb, var(--primary) 0%, transparent);
+  }
+}
+.signal-dot {
+  animation: signal-ping 2.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .signal-dot {
+    animation: none;
+  }
 }
