@@ -6,6 +6,9 @@ Students verify eligibility with a roll number and a one-time email code. Their 
 
 Built for Indian colleges running per-subject, per-class feedback cycles (a QR code per class, not per subject), with role-based dashboards for faculty, department admins, and institutional administrators.
 
+[![Deployed on Vercel](https://img.shields.io/badge/deployed-vercel-black?logo=vercel)](https://anon-feedback-iota.vercel.app)
+[![Tests](https://img.shields.io/badge/tests-34%20passing-brightgreen)](lib)
+
 **Live:** [anon-feedback-iota.vercel.app](https://anon-feedback-iota.vercel.app)
 
 ---
