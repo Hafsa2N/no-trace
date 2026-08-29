@@ -34,6 +34,7 @@ export default function MyDataPage() {
   const [record, setRecord] = useState<StudentRecord | null>(null);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
 
   async function requestOtp(e: React.FormEvent) {
     e.preventDefault();
@@ -83,9 +84,6 @@ export default function MyDataPage() {
   }
 
   async function deleteMyData() {
-    if (!confirm("Delete your roster record permanently? You won't be able to submit feedback for future sessions until re-added by your college. This can't be undone.")) {
-      return;
-    }
     setSubmitting(true);
     const res = await fetch("/api/my-data/delete", {
       method: "POST",
@@ -185,10 +183,28 @@ export default function MyDataPage() {
                     <Alert tone="error">{error}</Alert>
                   </div>
                 )}
-                <Button variant="danger" className="w-full" onClick={deleteMyData} disabled={submitting}>
-                  <Trash2 className="h-4 w-4" />
-                  {submitting ? "Deleting…" : "Delete my data"}
-                </Button>
+                {confirmingDelete ? (
+                  <div className="animate-step-in space-y-2.5 rounded-lg border border-danger/20 bg-danger-light px-3.5 py-3">
+                    <p className="text-sm text-danger">
+                      Delete your roster record permanently? You won&apos;t be able to submit
+                      feedback for future sessions until re-added by your college. This can&apos;t
+                      be undone.
+                    </p>
+                    <div className="flex items-center gap-3">
+                      <Button variant="danger" size="sm" onClick={deleteMyData} disabled={submitting}>
+                        {submitting ? "Deleting…" : "Yes, delete"}
+                      </Button>
+                      <button type="button" onClick={() => setConfirmingDelete(false)} className="text-sm text-muted hover:text-foreground">
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <Button variant="danger" className="w-full" onClick={() => setConfirmingDelete(true)}>
+                    <Trash2 className="h-4 w-4" />
+                    Delete my data
+                  </Button>
+                )}
               </CardBody>
             </Card>
           </div>

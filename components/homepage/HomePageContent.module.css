@@ -1,0 +1,620 @@
+/* Deliberately its own visual world — distinct from the app's institutional
+   admin-side tokens in globals.css. Scoped under .page (not :root) so none
+   of this leaks into the rest of the app, and vice versa. */
+.page {
+  --bg: #fdf4ec;
+  --surface: #f8e7d6;
+  --surface-2: #f0d8bf;
+  --ink: #241a2e;
+  --paper: #fff9f2;
+  --coral: #ff4b33;
+  --coral-dim: #e23a20;
+  --teal: #0e8f86;
+  --teal-bright: #0b7d75;
+  --muted: #7a6156;
+  --line: #e8d2bc;
+
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  position: relative;
+}
+.page * {
+  box-sizing: border-box;
+}
+.display {
+  font-family: var(--font-display), sans-serif;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+.mono {
+  font-family: var(--font-mono-nt), ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+}
+.wrap {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+.page :global(:focus-visible) {
+  outline: 2px solid var(--teal-bright);
+  outline-offset: 3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .page *,
+  .page *::before,
+  .page *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* grain overlay */
+.grain {
+  position: absolute;
+  inset: 0;
+  z-index: 200;
+  pointer-events: none;
+  opacity: 0.035;
+  mix-blend-mode: multiply;
+}
+
+/* custom cursor — fine pointers only, real cursor unaffected on touch devices */
+@media (pointer: fine) {
+  .cursorReady,
+  .cursorReady a,
+  .cursorReady button {
+    cursor: none;
+  }
+}
+.cursorDot,
+.cursorRing {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 300;
+  pointer-events: none;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+.cursorDot {
+  width: 6px;
+  height: 6px;
+  background: var(--coral);
+}
+.cursorRing {
+  width: 34px;
+  height: 34px;
+  border: 1.5px solid var(--muted);
+  transition:
+    width 0.25s cubic-bezier(0.2, 0.8, 0.2, 1),
+    height 0.25s cubic-bezier(0.2, 0.8, 0.2, 1),
+    border-color 0.25s,
+    background 0.25s;
+}
+.cursorRing.hovering {
+  width: 56px;
+  height: 56px;
+  border-color: var(--coral);
+  background: color-mix(in srgb, var(--coral) 12%, transparent);
+}
+
+/* ---------- NAV ---------- */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+.navInner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 32px;
+  max-width: 1180px;
+  margin: 0 auto;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-display), sans-serif;
+  font-weight: 900;
+  font-size: 22px;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+}
+.brandDot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--coral);
+}
+.navLinks {
+  display: flex;
+  align-items: center;
+  gap: 34px;
+}
+.plain {
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
+  transition: color 0.15s;
+}
+.plain:hover {
+  color: var(--ink);
+}
+@media (max-width: 700px) {
+  .navLinks .plain {
+    display: none;
+  }
+}
+
+/* magnetic button */
+.magnetic {
+  position: relative;
+  display: inline-flex;
+}
+.magneticBtn {
+  background: var(--coral);
+  color: var(--paper);
+  border: none;
+  border-radius: 999px;
+  padding: 13px 26px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition:
+    transform 0.18s cubic-bezier(0.2, 0.8, 0.2, 1),
+    background 0.18s;
+  will-change: transform;
+  cursor: pointer;
+}
+.magneticBtn:hover {
+  background: var(--coral-dim);
+}
+.magneticBtn.dark {
+  background: var(--ink);
+}
+.magneticBtn.dark:hover {
+  background: #382a3d;
+}
+
+/* ---------- MARQUEE ---------- */
+.marqueeBand {
+  background: var(--coral);
+  color: var(--paper);
+  overflow: hidden;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--coral-dim);
+}
+.marqueeTrack {
+  display: flex;
+  width: max-content;
+  animation: marquee 22s linear infinite;
+}
+.marqueeTrack span {
+  font-family: var(--font-display), sans-serif;
+  font-weight: 900;
+  font-size: 20px;
+  text-transform: uppercase;
+  padding: 0 28px;
+  white-space: nowrap;
+  letter-spacing: 0.01em;
+}
+.marqueeTrack span::after {
+  content: "—";
+  margin-left: 28px;
+  opacity: 0.5;
+}
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* ---------- HERO ---------- */
+.hero {
+  position: relative;
+  padding: 88px 0 110px;
+}
+.heroCanvas {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.55;
+}
+.hero > .wrap {
+  position: relative;
+  z-index: 1;
+}
+.heroEyebrow {
+  font-family: var(--font-mono-nt), monospace;
+  font-size: 12.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.pulse {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--coral);
+  animation: pulse 1.8s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(1.4);
+  }
+}
+
+.heroH1 {
+  margin: 22px 0 0;
+  font-size: clamp(52px, 10vw, 128px);
+  line-height: 0.86;
+  color: var(--ink);
+}
+.heroLine {
+  display: block;
+  overflow: hidden;
+}
+.heroLine span {
+  display: inline-block;
+  animation: rise 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.heroLine:nth-child(1) span {
+  animation-delay: 0.05s;
+}
+.heroLine:nth-child(2) span {
+  animation-delay: 0.18s;
+  color: var(--coral);
+}
+.heroLine:nth-child(3) span {
+  animation-delay: 0.3s;
+  -webkit-text-stroke: 2px var(--ink);
+  color: transparent;
+}
+@keyframes rise {
+  from {
+    transform: translateY(110%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.heroSub {
+  margin-top: 46px;
+}
+.heroSub p {
+  font-size: 19px;
+  color: var(--muted);
+  max-width: 460px;
+  line-height: 1.6;
+}
+.heroActions {
+  margin-top: 26px;
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* ---------- SCROLL REVEAL ---------- */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 0.7s ease,
+    transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.reveal.in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ---------- COLOR BLOCK: HOW IT WORKS ---------- */
+.howBlock {
+  background: var(--coral);
+  color: var(--paper);
+  padding: 90px 0 70px;
+}
+.howHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-bottom: 44px;
+}
+.howHead h2 {
+  font-size: clamp(34px, 5vw, 58px);
+  line-height: 0.92;
+}
+.howHead p {
+  font-family: var(--font-mono-nt), monospace;
+  font-size: 13px;
+  max-width: 260px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.scrollStrip {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  padding: 4px 32px 24px;
+  scroll-snap-type: x mandatory;
+  margin: 0 -32px;
+}
+.scrollStrip::-webkit-scrollbar {
+  height: 6px;
+}
+.scrollStrip::-webkit-scrollbar-thumb {
+  background: var(--paper);
+  border-radius: 3px;
+}
+.stripPerspective {
+  perspective: 1200px;
+  display: flex;
+}
+.stepCard {
+  scroll-snap-align: start;
+  flex: 0 0 320px;
+  background: var(--bg);
+  color: var(--ink);
+  border-radius: 18px;
+  padding: 30px 26px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.12s linear;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+.stepNum {
+  font-family: var(--font-display), sans-serif;
+  font-weight: 900;
+  font-size: 76px;
+  line-height: 1;
+  color: var(--surface-2);
+  position: absolute;
+  top: 10px;
+  right: 18px;
+}
+.stepCard h3 {
+  font-family: var(--font-body), sans-serif;
+  font-weight: 700;
+  font-size: 19px;
+  margin: 40px 0 12px;
+  position: relative;
+}
+.stepCard p {
+  font-size: 14.5px;
+  color: var(--muted);
+  line-height: 1.6;
+  position: relative;
+}
+.stepTag {
+  display: inline-block;
+  margin-top: 14px;
+  font-family: var(--font-mono-nt), monospace;
+  font-size: 10.5px;
+  color: var(--teal-bright);
+  position: relative;
+}
+
+/* ---------- FACT GRID ---------- */
+.facts {
+  padding: 100px 0;
+}
+.factsHead {
+  max-width: 640px;
+  margin-bottom: 50px;
+}
+.factsHead .heroEyebrow {
+  color: var(--teal-bright);
+}
+.factsHead .heroEyebrow .pulse {
+  background: var(--teal-bright);
+}
+.factsHead h2 {
+  margin-top: 14px;
+  font-size: clamp(30px, 4.5vw, 50px);
+  line-height: 0.94;
+}
+.factsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  overflow: hidden;
+}
+@media (max-width: 760px) {
+  .factsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+.factItem {
+  background: var(--surface);
+  padding: 38px 30px;
+  transition: background 0.3s;
+}
+.factItem:hover {
+  background: var(--surface-2);
+}
+.factNum {
+  font-family: var(--font-display), sans-serif;
+  font-weight: 900;
+  font-size: 56px;
+  color: var(--coral);
+  line-height: 1;
+}
+.factDesc {
+  margin-top: 12px;
+  font-size: 14.5px;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+/* ---------- FAQ ---------- */
+.faq {
+  padding: 20px 0 110px;
+}
+.faqHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-bottom: 40px;
+}
+.faqHead h2 {
+  font-size: clamp(30px, 4.5vw, 50px);
+  line-height: 0.94;
+}
+.faqItem {
+  border-top: 1px solid var(--line);
+}
+.faqItem:last-child {
+  border-bottom: 1px solid var(--line);
+}
+.faqQ {
+  width: 100%;
+  background: none;
+  border: none;
+  color: var(--ink);
+  text-align: left;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  padding: 24px 0;
+  font-family: var(--font-body), sans-serif;
+  font-size: 19px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.faqQn {
+  font-family: var(--font-mono-nt), monospace;
+  font-size: 13px;
+  color: var(--coral-dim);
+  margin-right: 16px;
+  font-weight: 400;
+}
+.faqPlus {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
+    background 0.3s;
+}
+.faqItem.open .faqPlus {
+  transform: rotate(135deg);
+  background: var(--coral);
+  border-color: var(--coral);
+}
+.faqAWrap {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.faqItem.open .faqAWrap {
+  max-height: 200px;
+}
+.faqA {
+  padding: 0 0 26px;
+  font-size: 15.5px;
+  color: var(--muted);
+  max-width: 620px;
+  line-height: 1.65;
+}
+
+/* ---------- CTA ---------- */
+.ctaBlock {
+  background: var(--teal);
+  padding: 100px 0;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.ctaBlock h2 {
+  font-size: clamp(38px, 7vw, 84px);
+  line-height: 0.9;
+  color: var(--paper);
+}
+.ctaBlock p {
+  margin-top: 18px;
+  color: color-mix(in srgb, var(--paper) 78%, transparent);
+  font-size: 16px;
+}
+.ctaBlock .heroActions {
+  justify-content: center;
+  margin-top: 34px;
+}
+.ctaBlock .magneticBtn {
+  background: var(--ink);
+  color: var(--paper);
+}
+.ctaBlock .magneticBtn:hover {
+  background: #17101d;
+}
+
+.footer {
+  padding: 44px 0;
+  background: var(--bg);
+  border-top: 1px solid var(--line);
+}
+.footInner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.footLinks {
+  display: flex;
+  gap: 26px;
+}
+.footLinks a {
+  color: var(--muted);
+  font-size: 13px;
+  text-decoration: none;
+}
+.footLinks a:hover {
+  color: var(--ink);
+}

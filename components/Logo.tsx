@@ -7,7 +7,7 @@ export function Logo({ href = "/" }: { href?: string }) {
       <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-white">
         <ShieldCheck className="h-4 w-4" />
       </span>
-      <span>Anonymous Feedback</span>
+      <span>No Trace</span>
     </Link>
   );
 }

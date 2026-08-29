@@ -6,7 +6,9 @@ import { ShieldCheck, CheckCircle2 } from "lucide-react";
 import { Card, CardBody } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Field, Input } from "@/components/ui/Input";
+import { PasswordInput } from "@/components/ui/PasswordInput";
 import { Alert } from "@/components/ui/Alert";
+import { LoadingScreen } from "@/components/ui/LoadingScreen";
 
 type Status = "checking" | "ready" | "already-done" | "form" | "submitting" | "done";
 
@@ -64,24 +66,26 @@ export default function SetupPage() {
 
         <Card>
           <CardBody>
-            {status === "checking" && <p className="py-4 text-center text-sm text-muted">Checking…</p>}
+            {status === "checking" && <LoadingScreen label="Checking this instance…" />}
 
             {status === "already-done" && (
               <Alert tone="info">
-                Setup has already been completed for this deployment. Log in with your existing
-                admin account instead.
+                <span className="animate-step-in">
+                  Setup has already been completed for this deployment. Log in with your existing
+                  admin account instead.
+                </span>
               </Alert>
             )}
 
             {status === "done" && (
-              <div className="flex flex-col items-center gap-2 py-4 text-center">
+              <div className="animate-step-in flex flex-col items-center gap-2 py-4 text-center">
                 <CheckCircle2 className="h-6 w-6 text-accent" />
                 <p className="text-sm font-medium">Admin account created — signing you in…</p>
               </div>
             )}
 
             {(status === "form" || status === "submitting") && (
-              <form onSubmit={onSubmit} className="space-y-4">
+              <form onSubmit={onSubmit} className="animate-step-in space-y-4">
                 <p className="text-sm text-muted">
                   This runs once. As soon as this account is created, this page stops working —
                   add more admins from within the app after logging in.
@@ -90,11 +94,10 @@ export default function SetupPage() {
                   <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoFocus />
                 </Field>
                 <Field label="Password" hint="At least 8 characters.">
-                  <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} />
+                  <PasswordInput value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} />
                 </Field>
                 <Field label="Confirm password">
-                  <Input
-                    type="password"
+                  <PasswordInput
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     required
