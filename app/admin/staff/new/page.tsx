@@ -5,10 +5,12 @@ import { useRouter } from "next/navigation";
 import { Card, CardBody } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Field, Input, Select } from "@/components/ui/Input";
+import { PasswordInput } from "@/components/ui/PasswordInput";
 import { Alert } from "@/components/ui/Alert";
 
 export default function NewStaffPage() {
   const router = useRouter();
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState<"admin" | "faculty">("faculty");
@@ -22,7 +24,7 @@ export default function NewStaffPage() {
     const res = await fetch("/api/staff", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password, role }),
+      body: JSON.stringify({ email, password, role, name }),
     });
     const data = await res.json();
     setSubmitting(false);
@@ -35,7 +37,7 @@ export default function NewStaffPage() {
 
   return (
     <div className="mx-auto max-w-lg px-6 py-10">
-      <h1 className="text-2xl font-semibold tracking-tight">Add a staff account</h1>
+      <h1 className="font-display text-3xl font-black uppercase tracking-tight">Add a staff account</h1>
       <p className="mt-1.5 mb-6 text-sm text-muted">
         Give them this email and password to log in at /admin/login. Faculty will only see
         results for subjects you assign to them when creating a session.
@@ -44,11 +46,14 @@ export default function NewStaffPage() {
       <Card>
         <CardBody>
           <form onSubmit={onSubmit} className="space-y-4">
+            <Field label="Name" hint="Optional — shown instead of their email wherever results are attributed to them, e.g. in a class's analysis.">
+              <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Dr. Priya Rao" />
+            </Field>
             <Field label="Email">
               <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoFocus />
             </Field>
             <Field label="Temporary password" hint="At least 8 characters — share this with them directly.">
-              <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} />
+              <PasswordInput value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} />
             </Field>
             <Field label="Role">
               <Select value={role} onChange={(e) => setRole(e.target.value as "admin" | "faculty")}>

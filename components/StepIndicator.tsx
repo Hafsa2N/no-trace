@@ -20,7 +20,7 @@ export function StepIndicator({ steps, current }: { steps: string[]; current: nu
                 {state === "done" ? <Check className="h-3.5 w-3.5" /> : i + 1}
               </span>
               <span
-                className={`text-xs ${state === "upcoming" ? "text-muted" : "font-medium text-foreground"}`}
+                className={`font-mono text-[10px] uppercase tracking-[0.06em] ${state === "upcoming" ? "text-muted" : "font-medium text-foreground"}`}
               >
                 {label}
               </span>

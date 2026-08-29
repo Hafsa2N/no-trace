@@ -19,7 +19,7 @@ export default async function AdminUpdatesPage() {
     <div className="mx-auto max-w-2xl px-6 py-10">
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Feedback changelog</h1>
+          <h1 className="font-display text-3xl font-black uppercase tracking-tight">Feedback changelog</h1>
           <p className="text-sm text-muted">Shown to students at /updates</p>
         </div>
         {session.role === "admin" && (

@@ -51,7 +51,7 @@ export default function NewUpdatePage() {
 
   return (
     <div className="mx-auto max-w-lg px-6 py-10">
-      <h1 className="text-2xl font-semibold tracking-tight">Post an update</h1>
+      <h1 className="font-display text-3xl font-black uppercase tracking-tight">Post an update</h1>
       <p className="mt-1.5 mb-6 text-sm text-muted">
         Shown publicly at /updates. Keep it aggregate — this is about what changed, not
         who said what.

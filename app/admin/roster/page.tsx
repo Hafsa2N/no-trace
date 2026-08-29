@@ -1,97 +1,97 @@
-"use client";
+import { redirect } from "next/navigation";
+import { Users } from "lucide-react";
+import { getAdminSession } from "@/lib/auth";
+import { sql } from "@/lib/db";
+import { Card } from "@/components/ui/Card";
+import { RosterUploadForm } from "@/components/RosterUploadForm";
 
-import { DragEvent, useState } from "react";
-import { FileSpreadsheet, UploadCloud } from "lucide-react";
-import { Card, CardBody } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
-import { Alert } from "@/components/ui/Alert";
+export default async function RosterUploadPage() {
+  const session = await getAdminSession();
+  if (!session) redirect("/admin/login");
+  if (session.role !== "admin") redirect("/admin");
 
-export default function RosterUploadPage() {
-  const [file, setFile] = useState<File | null>(null);
-  const [dragging, setDragging] = useState(false);
-  const [result, setResult] = useState("");
-  const [error, setError] = useState("");
-  const [submitting, setSubmitting] = useState(false);
+  const [countRows, classRows, lastUpload] = await Promise.all([
+    sql`select count(*) as count from students`,
+    sql`select department, year, section, count(*) as count from students group by department, year, section order by department, year, section`,
+    sql`
+      select a.created_at, a.details, ad.email as uploaded_by
+      from audit_log a
+      left join admins ad on ad.id = a.actor_id
+      where a.action = 'roster.uploaded'
+      order by a.created_at desc
+      limit 1
+    `,
+  ]);
 
-  function handleDrop(e: DragEvent<HTMLLabelElement>) {
-    e.preventDefault();
-    setDragging(false);
-    const dropped = e.dataTransfer.files?.[0];
-    if (dropped) setFile(dropped);
-  }
-
-  async function onSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setError("");
-    setResult("");
-    if (!file) return;
-
-    setSubmitting(true);
-    const form = new FormData();
-    form.append("file", file);
-    const res = await fetch("/api/roster/upload", { method: "POST", body: form });
-    const data = await res.json();
-    setSubmitting(false);
-    if (!res.ok) {
-      setError(data.error ?? "Upload failed");
-      return;
-    }
-    setResult(`Upserted ${data.upserted} of ${data.rowsProcessed} rows.`);
-    setFile(null);
-  }
+  const totalStudents = Number(countRows[0].count);
+  const last = lastUpload[0];
 
   return (
-    <div className="mx-auto max-w-lg px-6 py-10">
-      <h1 className="text-2xl font-semibold tracking-tight">Upload student roster</h1>
-      <p className="mt-1.5 mb-6 text-sm text-muted">
-        Excel file with columns: <code className="rounded bg-primary-light px-1 py-0.5 text-primary">roll_number, name, department, year, section, email</code>.
-        Existing rows with the same roll number are updated, not duplicated.
-      </p>
+    <div className="mx-auto max-w-lg px-6 py-10 space-y-6">
+      <div>
+        <h1 className="font-display text-3xl font-black uppercase tracking-tight">Student roster</h1>
+        <p className="mt-1.5 text-sm text-muted">
+          Excel file with columns:{" "}
+          <code className="rounded bg-primary-light px-1 py-0.5 text-primary">
+            roll_number, name, department, year, section, email
+          </code>
+          . Existing rows with the same roll number are updated, not duplicated.
+        </p>
+      </div>
 
-      <Card>
-        <CardBody>
-          <form onSubmit={onSubmit} className="space-y-4">
-            <label
-              onDragOver={(e) => {
-                e.preventDefault();
-                setDragging(true);
-              }}
-              onDragLeave={() => setDragging(false)}
-              onDrop={handleDrop}
-              className={`flex cursor-pointer flex-col items-center gap-2 rounded-lg border-2 border-dashed px-6 py-10 text-center transition-colors ${
-                dragging ? "border-primary bg-primary-light" : "border-border hover:border-primary/40"
-              }`}
-            >
-              {file ? (
-                <>
-                  <FileSpreadsheet className="h-8 w-8 text-primary" />
-                  <p className="text-sm font-medium">{file.name}</p>
-                  <p className="text-xs text-muted">{(file.size / 1024).toFixed(0)} KB — click to change</p>
-                </>
-              ) : (
-                <>
-                  <UploadCloud className="h-8 w-8 text-muted" />
-                  <p className="text-sm font-medium">Drop your .xlsx file here, or click to browse</p>
-                  <p className="text-xs text-muted">.xlsx, .xls, or .csv</p>
-                </>
-              )}
-              <input
-                type="file"
-                accept=".xlsx,.xls,.csv"
-                onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-                className="hidden"
-              />
-            </label>
+      {totalStudents > 0 && (
+        <Card className="overflow-hidden">
+          <div className="flex items-center gap-2.5 border-b border-border px-4 py-3">
+            <Users className="h-4 w-4 text-muted" />
+            <p className="text-sm font-medium">
+              {totalStudents} student{totalStudents === 1 ? "" : "s"} on file
+            </p>
+            {last && (
+              <p className="ml-auto text-xs text-muted">
+                Last uploaded {new Date(last.created_at).toLocaleDateString()}
+                {last.uploaded_by ? ` by ${last.uploaded_by}` : ""}
+              </p>
+            )}
+          </div>
+          <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-border text-left text-xs text-muted">
+                <th scope="col" className="px-4 py-2 font-medium">
+                  Department
+                </th>
+                <th scope="col" className="px-4 py-2 font-medium">
+                  Year
+                </th>
+                <th scope="col" className="px-4 py-2 font-medium">
+                  Section
+                </th>
+                <th scope="col" className="px-4 py-2 text-right font-medium">
+                  Students
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {classRows.map((c) => (
+                <tr key={`${c.department}-${c.year}-${c.section}`}>
+                  <td className="px-4 py-2.5 font-medium text-foreground">{c.department}</td>
+                  <td className="px-4 py-2.5 text-muted">{c.year}</td>
+                  <td className="px-4 py-2.5 text-muted">{c.section}</td>
+                  <td className="px-4 py-2.5 text-right tabular-nums text-muted">{c.count}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          </div>
+        </Card>
+      )}
 
-            {error && <Alert tone="error">{error}</Alert>}
-            {result && <Alert tone="success">{result}</Alert>}
-
-            <Button type="submit" className="w-full" disabled={!file || submitting}>
-              {submitting ? "Uploading…" : "Upload"}
-            </Button>
-          </form>
-        </CardBody>
-      </Card>
+      <div>
+        <p className="mb-2 text-sm font-medium">
+          {totalStudents > 0 ? "Upload a new file" : "Upload your roster"}
+        </p>
+        <RosterUploadForm />
+      </div>
     </div>
   );
 }
