@@ -36,6 +36,13 @@ yarn-error.log*
 # vercel
 .vercel
 
+# personal/unreviewed documents — not verified free of personal info before
+# a public push; add back explicitly (git add -f) once checked
+/docs/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+.vercel
+.env*
