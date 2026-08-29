@@ -15,5 +15,14 @@ export const GET = withErrors(async (_req: NextRequest, { params }: { params: Pr
     return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
   }
 
+  // Same gate the offering detail page enforces before rendering anything —
+  // an admin can review results before releasing them to faculty, and that
+  // has to hold here too, not just in the page component. Without this, a
+  // faculty account could call this route directly and see results the
+  // admin has deliberately not shared yet.
+  if (session.role === "faculty" && !analytics.offering.resultsPublished) {
+    return NextResponse.json({ error: "Results not shared yet" }, { status: 403 });
+  }
+
   return NextResponse.json(analytics);
 });

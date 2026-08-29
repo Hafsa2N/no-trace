@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
+import { sql } from "@/lib/db";
 
 const COOKIE_NAME = "admin_session";
 
@@ -31,7 +32,18 @@ export async function getAdminSession(): Promise<AdminSession | null> {
   const store = await cookies();
   const token = store.get(COOKIE_NAME)?.value;
   if (!token) return null;
-  return verifyAdminSessionToken(token);
+  const claims = verifyAdminSessionToken(token);
+  if (!claims) return null;
+
+  // The JWT alone is valid for up to 12h regardless of DB state — checking
+  // is_active/role here on every request (not just at login) means
+  // deactivating an account or changing its role takes effect immediately,
+  // not "whenever their token happens to expire."
+  const rows = await sql`select role, is_active from admins where id = ${claims.id}`;
+  const current = rows[0];
+  if (!current || !current.is_active) return null;
+
+  return { id: claims.id, email: claims.email, role: current.role };
 }
 
 export const ADMIN_COOKIE_NAME = COOKIE_NAME;

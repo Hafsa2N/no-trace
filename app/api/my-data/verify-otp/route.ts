@@ -3,11 +3,17 @@ import { sql } from "@/lib/db";
 import { hashOtp } from "@/lib/crypto";
 import { signMyDataToken } from "@/lib/myDataAuth";
 import { withErrors } from "@/lib/api";
+import { checkRateLimit, RATE_LIMIT_MESSAGE } from "@/lib/rateLimit";
 
 export const POST = withErrors(async (req: NextRequest) => {
   const { rollNumber, code } = await req.json();
   if (!rollNumber || !code) {
     return NextResponse.json({ error: "rollNumber and code required" }, { status: 400 });
+  }
+
+  const okAttempts = await checkRateLimit(`mydata-verify:${rollNumber.trim()}`, 8, 15 * 60);
+  if (!okAttempts) {
+    return NextResponse.json({ error: RATE_LIMIT_MESSAGE }, { status: 429 });
   }
 
   const codeHash = hashOtp(code, "my-data", rollNumber.trim());

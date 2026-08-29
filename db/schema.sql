@@ -29,8 +29,23 @@ create table students (
 create table admins (
   id            uuid primary key default gen_random_uuid(),
   email         text unique not null,
+  -- Optional, admin-entered display name — the login itself is always the
+  -- email (nothing here is authenticated by name), but a class taught by
+  -- three different faculty reads much faster as "Dr. Rao / Prof. Iyer /
+  -- Dr. Menon" than three emails. Nullable because it's filled in as
+  -- staff accounts are (re)created, not backfilled for existing ones —
+  -- every display falls back to the email when it's null.
+  name          text,
   password_hash text not null,
   role          text not null check (role in ('admin', 'faculty')),
+  -- Deactivating rather than deleting an account: sessions, session_offerings,
+  -- updates, and audit_log all reference admins(id) to record who taught a
+  -- subject, created a session, or took an administrative action. Deleting
+  -- the row outright would either violate those foreign keys or (if
+  -- cascaded) silently erase that historical attribution — which is exactly
+  -- the audit trail and cross-term faculty history this app exists to keep.
+  -- A deactivated account simply can't log in anymore; its history stays intact.
+  is_active     boolean not null default true,
   created_at    timestamptz not null default now()
 );
 
@@ -89,6 +104,11 @@ create table session_offerings (
   -- subjects in the same class session — enforced at the query level, not
   -- just hidden in the UI.
   assigned_faculty uuid references admins(id),
+  -- Admin-controlled: whether the assigned faculty can see this offering's
+  -- results yet. Lets an admin review feedback first — e.g. before a
+  -- department meeting — rather than faculty watching live results
+  -- trickle in, which real institutions often want control over.
+  results_published boolean not null default true,
   created_at      timestamptz not null default now()
 );
 
@@ -179,7 +199,33 @@ create table responses (
   created_at    timestamptz not null default now()
 );
 
+-- Self-service "forgot password" for staff accounts (admin or faculty) —
+-- same OTP-to-registered-email pattern as everything else here, so an
+-- admin locked out of their own account, or a faculty member who forgot
+-- theirs, doesn't need someone else to intervene. Requires real email
+-- delivery to be configured to actually work; see lib/email.ts.
+create table staff_reset_codes (
+  id            uuid primary key default gen_random_uuid(),
+  admin_id      uuid not null references admins(id),
+  code_hash     text not null,
+  expires_at    timestamptz not null,
+  consumed      boolean not null default false,
+  created_at    timestamptz not null default now()
+);
+
+-- Backing store for a sliding-window rate limiter (see lib/rateLimit.ts).
+-- Postgres-backed rather than in-memory, since serverless functions don't
+-- share process memory across invocations — an in-memory counter would
+-- reset (or fail to be shared) on every cold start / different instance.
+create table rate_limit_hits (
+  id         uuid primary key default gen_random_uuid(),
+  key        text not null,
+  created_at timestamptz not null default now()
+);
+
+create index on staff_reset_codes (admin_id);
 create index on otp_codes (session_id, roll_number);
 create index on session_offerings (session_id);
 create index on session_offerings (course_id);
 create index on responses (session_offering_id);
+create index on rate_limit_hits (key, created_at);

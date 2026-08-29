@@ -5,14 +5,7 @@ import { generatePasscode } from "@/lib/crypto";
 import { withErrors } from "@/lib/api";
 import { logAction } from "@/lib/audit";
 import { resolveCourseId, resolveTermId } from "@/lib/courses";
-
-const DEFAULT_QUESTIONS = [
-  { id: "pace", type: "rating", label: "The pace of teaching was appropriate" },
-  { id: "clarity", type: "rating", label: "Concepts were explained clearly" },
-  { id: "engagement", type: "rating", label: "The faculty encouraged questions and interaction" },
-  { id: "fairness", type: "rating", label: "Assessments were fair and well-aligned with what was taught" },
-  { id: "comment", type: "text", label: "Anything else you'd like to share? (optional)" },
-];
+import { defaultQuestions } from "@/lib/questionTemplates";
 
 type OfferingInput = { subject: string; assignedFaculty?: string | null };
 
@@ -67,7 +60,7 @@ export const POST = withErrors(async (req: NextRequest) => {
   const sessionRows = await sql`
     insert into sessions (department, year, section, passcode, questions, opens_at, closes_at, created_by, term_id)
     values (${department}, ${year}, ${section}, ${passcode},
-            ${JSON.stringify(questions ?? DEFAULT_QUESTIONS)}, ${opens.toISOString()}, ${closes.toISOString()}, ${session.id},
+            ${JSON.stringify(questions ?? defaultQuestions())}, ${opens.toISOString()}, ${closes.toISOString()}, ${session.id},
             ${resolvedTermId})
     returning id, passcode
   `;
@@ -76,9 +69,12 @@ export const POST = withErrors(async (req: NextRequest) => {
   const createdOfferings = [];
   for (const offering of offerings) {
     const courseId = await resolveCourseId(offering.subject, department);
+    // New offerings start unpublished to faculty — the admin explicitly
+    // publishes once results are ready to share, rather than faculty
+    // watching live results trickle in as students submit.
     const offeringRows = await sql`
-      insert into session_offerings (session_id, course_id, assigned_faculty)
-      values (${sessionId}, ${courseId}, ${offering.assignedFaculty || null})
+      insert into session_offerings (session_id, course_id, assigned_faculty, results_published)
+      values (${sessionId}, ${courseId}, ${offering.assignedFaculty || null}, false)
       returning id
     `;
     createdOfferings.push({ id: offeringRows[0].id, subject: offering.subject });

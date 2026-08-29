@@ -35,3 +35,13 @@ export function generateAnonymousToken(): string {
 export function generatePasscode(): string {
   return randomBytes(4).toString("hex").toUpperCase();
 }
+
+// Readable-ish temporary password for bulk-created staff accounts — shown
+// once to the admin doing the upload so they can distribute it manually
+// (no email delivery guaranteed to be configured). Avoids visually
+// ambiguous characters (0/O, 1/l/I) since these get read off a screen and
+// typed by hand.
+const TEMP_PASSWORD_CHARS = "ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789";
+export function generateTempPassword(length = 10): string {
+  return Array.from({ length }, () => TEMP_PASSWORD_CHARS[randomInt(0, TEMP_PASSWORD_CHARS.length)]).join("");
+}

@@ -11,7 +11,7 @@ export const GET = withErrors(async () => {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const rows = await sql`select id, email, role, created_at from admins order by email`;
+  const rows = await sql`select id, email, name, role, is_active, created_at from admins order by email`;
   return NextResponse.json({ staff: rows });
 });
 
@@ -25,7 +25,7 @@ export const POST = withErrors(async (req: NextRequest) => {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { email, password, role } = await req.json();
+  const { email, password, role, name } = await req.json();
   if (!email || !password || String(password).length < 8) {
     return NextResponse.json({ error: "A valid email and a password of at least 8 characters are required" }, { status: 400 });
   }
@@ -40,9 +40,9 @@ export const POST = withErrors(async (req: NextRequest) => {
 
   const passwordHash = await bcrypt.hash(password, 10);
   const rows = await sql`
-    insert into admins (email, password_hash, role)
-    values (${email}, ${passwordHash}, ${role})
-    returning id, email, role
+    insert into admins (email, password_hash, role, name)
+    values (${email}, ${passwordHash}, ${role}, ${name?.trim() || null})
+    returning id, email, role, name
   `;
 
   await logAction(session.id, "staff.created", rows[0].id, { email, role });

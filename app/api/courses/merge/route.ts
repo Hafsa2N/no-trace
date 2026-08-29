@@ -28,7 +28,7 @@ export const POST = withErrors(async (req: NextRequest) => {
     return NextResponse.json({ error: "One or both courses not found" }, { status: 404 });
   }
 
-  await sql`update sessions set course_id = ${targetId} where course_id = ${sourceId}`;
+  await sql`update session_offerings set course_id = ${targetId} where course_id = ${sourceId}`;
   await sql`update updates set course_id = ${targetId} where course_id = ${sourceId}`;
   await sql`delete from courses where id = ${sourceId}`;
 

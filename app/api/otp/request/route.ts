@@ -3,22 +3,46 @@ import { sql } from "@/lib/db";
 import { generateOtp, hashOtp, hashRollNumber } from "@/lib/crypto";
 import { sendOtpEmail } from "@/lib/email";
 import { withErrors } from "@/lib/api";
+import { checkRateLimit, clientIp, RATE_LIMIT_MESSAGE } from "@/lib/rateLimit";
+import { isSessionOpen } from "@/lib/sessionWindow";
 
 export const POST = withErrors(async (req: NextRequest) => {
-  const { sessionId, rollNumber, consent } = await req.json();
-  if (!sessionId || !rollNumber) {
-    return NextResponse.json({ error: "sessionId and rollNumber required" }, { status: 400 });
+  const { sessionId, rollNumber, passcode, consent } = await req.json();
+  if (!sessionId || !rollNumber || !passcode) {
+    return NextResponse.json({ error: "sessionId, rollNumber and passcode required" }, { status: 400 });
   }
   if (consent !== true) {
     return NextResponse.json({ error: "You must acknowledge the privacy notice to continue" }, { status: 400 });
+  }
+
+  // Per-student: stops one roll number's inbox being spammed with codes —
+  // this is the real protection, scoped to an identity, not a network.
+  // Per-IP: a much looser secondary check against one caller scripting
+  // through many different roll numbers. Deliberately high — an entire
+  // class (60+ students) submitting from the same campus WiFi/NAT shares
+  // one public IP, and a low cap here would lock out real students partway
+  // through a normal session, not just block an attacker. (Caught in
+  // testing: 20/hour was low enough to do exactly that.)
+  const okStudent = await checkRateLimit(`otp-req:${sessionId}:${rollNumber.trim()}`, 5, 15 * 60);
+  const okIp = await checkRateLimit(`otp-req-ip:${clientIp(req)}`, 300, 60 * 60);
+  if (!okStudent || !okIp) {
+    return NextResponse.json({ error: RATE_LIMIT_MESSAGE }, { status: 429 });
   }
 
   const sessionRows = await sql`select * from sessions where id = ${sessionId}`;
   const session = sessionRows[0];
   if (!session) return NextResponse.json({ error: "Session not found" }, { status: 404 });
 
-  const now = new Date();
-  if (now < new Date(session.opens_at) || now > new Date(session.closes_at)) {
+  // The passcode is shown openly alongside the QR code — it isn't a secret
+  // from students, it's a "you got this from the actual class" gate (a
+  // student would need to have seen the shared screen/handout, not just
+  // guessed a roll number). Checked before the eligibility lookup so a
+  // wrong passcode never even touches the roster.
+  if (String(passcode).trim().toUpperCase() !== session.passcode) {
+    return NextResponse.json({ error: "Incorrect passcode" }, { status: 403 });
+  }
+
+  if (!isSessionOpen(session.opens_at, session.closes_at)) {
     return NextResponse.json({ error: "This feedback session is not currently open" }, { status: 403 });
   }
 

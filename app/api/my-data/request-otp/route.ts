@@ -3,10 +3,20 @@ import { sql } from "@/lib/db";
 import { generateOtp, hashOtp } from "@/lib/crypto";
 import { sendOtpEmail } from "@/lib/email";
 import { withErrors } from "@/lib/api";
+import { checkRateLimit, clientIp, RATE_LIMIT_MESSAGE } from "@/lib/rateLimit";
 
 export const POST = withErrors(async (req: NextRequest) => {
   const { rollNumber } = await req.json();
   if (!rollNumber) return NextResponse.json({ error: "rollNumber required" }, { status: 400 });
+
+  // Same shared-IP reasoning as /api/otp/request — a campus WiFi/NAT can
+  // put many distinct students behind one IP, so the IP cap must stay far
+  // looser than the per-identity one.
+  const okStudent = await checkRateLimit(`mydata-req:${rollNumber.trim()}`, 5, 15 * 60);
+  const okIp = await checkRateLimit(`mydata-req-ip:${clientIp(req)}`, 300, 60 * 60);
+  if (!okStudent || !okIp) {
+    return NextResponse.json({ error: RATE_LIMIT_MESSAGE }, { status: 429 });
+  }
 
   const rows = await sql`select email from students where roll_number = ${rollNumber.trim()}`;
   const student = rows[0];
