@@ -17,7 +17,7 @@ export default function ErrorBoundary({ error, reset }: { error: Error & { diges
   return (
     <div className="flex flex-1 flex-col">
       <PublicHeader />
-      <div className="mx-auto flex w-full max-w-lg flex-1 flex-col items-center justify-center px-6 py-20 text-center">
+      <main className="mx-auto flex w-full max-w-lg flex-1 flex-col items-center justify-center px-6 py-20 text-center">
         <span className="mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-danger/10 text-danger">
           <TriangleAlert className="h-6 w-6" />
         </span>
@@ -35,7 +35,7 @@ export default function ErrorBoundary({ error, reset }: { error: Error & { diges
             Back to home
           </Link>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

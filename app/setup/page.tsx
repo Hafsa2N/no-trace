@@ -54,7 +54,7 @@ export default function SetupPage() {
   }
 
   return (
-    <div className="bg-hero flex flex-1 items-center justify-center px-6 py-16">
+    <main className="bg-hero flex flex-1 items-center justify-center px-6 py-16">
       <div className="w-full max-w-sm">
         <div className="mb-6 text-center">
           <span className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-primary text-white">
@@ -112,6 +112,6 @@ export default function SetupPage() {
           </CardBody>
         </Card>
       </div>
-    </div>
+    </main>
   );
 }

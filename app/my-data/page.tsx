@@ -101,7 +101,7 @@ export default function MyDataPage() {
     <div className="flex flex-1 flex-col">
       <PublicHeader />
 
-      <div className="mx-auto w-full max-w-lg flex-1 px-6 py-12">
+      <main className="mx-auto w-full max-w-lg flex-1 px-6 py-12">
         <div className="mb-6">
           <h1 className="text-xl font-semibold tracking-tight">Your data</h1>
           <p className="text-sm text-muted">
@@ -224,7 +224,7 @@ export default function MyDataPage() {
             </CardBody>
           </Card>
         )}
-      </div>
+      </main>
     </div>
   );
 }

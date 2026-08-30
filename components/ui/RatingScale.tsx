@@ -22,7 +22,7 @@ export function RatingScale({
           aria-label={`${n} of ${max}`}
           className={`font-display flex h-12 w-12 flex-1 items-center justify-center rounded-2xl border text-base font-black transition-all sm:h-14 sm:w-14 sm:flex-none ${
             value === n
-              ? "scale-105 border-primary bg-primary text-white shadow-md shadow-primary/25"
+              ? "scale-105 border-primary-solid bg-primary-solid text-white shadow-md shadow-primary/25"
               : "border-border bg-surface text-foreground hover:border-primary/40 hover:bg-primary-light active:scale-95"
           }`}
         >

@@ -9,6 +9,14 @@
   --paper: #fff9f2;
   --coral: #ff4b33;
   --coral-dim: #e23a20;
+  /* --coral against --paper text is 3.18:1 — below WCAG AA's 4.5:1 for
+     normal text (found via an axe-core audit; missed by the automated scan
+     itself because the button starts at opacity 0 in its scroll-reveal
+     state). Same darkened value as globals.css's --primary-solid, used only
+     for text-bearing solid-fill buttons; --coral itself is unchanged for
+     borders/backgrounds/icons elsewhere in this page. */
+  --coral-solid: #d61900;
+  --coral-solid-dim: #b81500;
   --teal: #0e8f86;
   --teal-bright: #0b7d75;
   --muted: #7a6156;
@@ -167,7 +175,7 @@
   display: inline-flex;
 }
 .magneticBtn {
-  background: var(--coral);
+  background: var(--coral-solid);
   color: var(--paper);
   border: none;
   border-radius: 999px;
@@ -186,7 +194,7 @@
   cursor: pointer;
 }
 .magneticBtn:hover {
-  background: var(--coral-dim);
+  background: var(--coral-solid-dim);
 }
 .magneticBtn.dark {
   background: var(--ink);

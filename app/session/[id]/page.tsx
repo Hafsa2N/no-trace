@@ -3,6 +3,7 @@
 import { use, useEffect, useId, useState } from "react";
 import Link from "next/link";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
+import "@/lib/dotlottieSetup";
 import {
   ShieldCheck,
   Mail,
@@ -314,7 +315,7 @@ export default function StudentSessionPage({ params }: { params: Promise<{ id: s
     <div className="flex flex-1 flex-col">
       <PublicHeader />
 
-      <div className="mx-auto w-full max-w-lg flex-1 px-6 py-12">
+      <main className="mx-auto w-full max-w-lg flex-1 px-6 py-12">
         {session && step !== "loading" && step !== "error" && step !== "already_submitted" && (
           <div className="mb-6 flex items-start justify-between gap-3">
             <div>
@@ -633,7 +634,7 @@ export default function StudentSessionPage({ params }: { params: Promise<{ id: s
                                 }
                                 className={`min-h-11 rounded-full border px-4 py-2.5 text-sm transition-colors ${
                                   selected
-                                    ? "border-primary bg-primary text-white"
+                                    ? "border-primary-solid bg-primary-solid text-white"
                                     : "border-border text-foreground hover:border-primary/40"
                                 }`}
                               >
@@ -875,7 +876,7 @@ export default function StudentSessionPage({ params }: { params: Promise<{ id: s
             )}
           </div>
         )}
-      </div>
+      </main>
     </div>
   );
 }

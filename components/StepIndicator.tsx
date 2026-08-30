@@ -11,9 +11,9 @@ export function StepIndicator({ steps, current }: { steps: string[]; current: nu
               <span
                 className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold transition-colors ${
                   state === "done"
-                    ? "bg-accent text-white"
+                    ? "bg-accent-solid text-white"
                     : state === "active"
-                      ? "bg-primary text-white"
+                      ? "bg-primary-solid text-white"
                       : "bg-slate-100 text-muted dark:bg-white/5"
                 }`}
               >

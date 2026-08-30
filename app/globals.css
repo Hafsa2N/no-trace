@@ -18,9 +18,17 @@
   --primary: #ff4b33;
   --primary-hover: #e23a20;
   --primary-light: #f8e7d6;
+  /* A darker shade of the same hue, used only where white text sits on a
+     solid fill (buttons, selected rating/MCQ tiles) — #ff4b33 itself gives
+     white text a 3.33:1 contrast ratio, below WCAG AA's 4.5:1 for normal
+     text (found via an axe-core audit). Non-text uses (icons, borders,
+     badges) keep --primary; only text-on-fill needed a darker value. */
+  --primary-solid: #d61900;
+  --primary-solid-hover: #b81500;
 
   --accent: #0e8f86;
   --accent-light: #dceeec;
+  --accent-solid: #0e8f86;
 
   --danger: #c23b3b;
   --danger-light: #fbeeee;
@@ -41,9 +49,12 @@
   --color-primary: var(--primary);
   --color-primary-hover: var(--primary-hover);
   --color-primary-light: var(--primary-light);
+  --color-primary-solid: var(--primary-solid);
+  --color-primary-solid-hover: var(--primary-solid-hover);
 
   --color-accent: var(--accent);
   --color-accent-light: var(--accent-light);
+  --color-accent-solid: var(--accent-solid);
 
   --color-danger: var(--danger);
   --color-danger-light: var(--danger-light);
@@ -67,9 +78,16 @@
     --primary: #ff6b52;
     --primary-hover: #ff8267;
     --primary-light: #3d2018;
+    --primary-solid: #d62300;
+    --primary-solid-hover: #b81e00;
 
     --accent: #1fbbaf;
     --accent-light: #0f2e2b;
+    /* #1fbbaf gives white text/icons only 2.39:1 contrast, below even the
+       3:1 non-text UI threshold — this darker shade (found via the same
+       axe-core-driven audit as --primary-solid) is used specifically for
+       the checkmark badge in StepIndicator. */
+    --accent-solid: #178c83;
 
     --danger: #e5807f;
     --danger-light: #341c1c;

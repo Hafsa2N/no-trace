@@ -18,7 +18,7 @@ export default async function UpdatesPage() {
     <div className="flex flex-1 flex-col">
       <PublicHeader />
 
-      <div className="mx-auto w-full max-w-2xl px-6 py-16">
+      <main className="mx-auto w-full max-w-2xl px-6 py-16">
         <h1 className="text-3xl font-semibold tracking-tight">What changed because of feedback</h1>
         <p className="mt-3 text-muted">
           Feedback that goes nowhere is why people stop giving it. Here&apos;s what&apos;s actually
@@ -59,7 +59,7 @@ export default async function UpdatesPage() {
             ))}
           </div>
         )}
-      </div>
+      </main>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
+import "@/lib/dotlottieSetup";
 
 /**
  * Full-page loading state — replaces plain "Loading…" text at the handful

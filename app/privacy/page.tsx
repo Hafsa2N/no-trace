@@ -46,7 +46,7 @@ export default function PrivacyPage() {
     <div className="flex flex-1 flex-col">
       <PublicHeader />
 
-      <div className="mx-auto w-full max-w-3xl px-6 py-16">
+      <main className="mx-auto w-full max-w-3xl px-6 py-16">
         <h1 className="text-3xl font-semibold tracking-tight">How your privacy is protected</h1>
         <p className="mt-3 text-muted">
           This platform is built so that identity verification and feedback storage never touch
@@ -139,7 +139,7 @@ export default function PrivacyPage() {
             </p>
           </div>
         </details>
-      </div>
+      </main>
     </div>
   );
 }

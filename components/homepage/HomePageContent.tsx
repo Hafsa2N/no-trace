@@ -259,6 +259,7 @@ export function HomePageContent() {
         </div>
       </nav>
 
+      <main>
       <div className={styles.marqueeBand}>
         <div className={styles.marqueeTrack}>
           {Array.from({ length: 2 }).map((_, i) => (
@@ -303,7 +304,12 @@ export function HomePageContent() {
           </div>
         </div>
         <div className={styles.wrap} style={{ padding: 0 }}>
-          <div className={`${styles.scrollStrip} ${styles.stripPerspective}`}>
+          <div
+            className={`${styles.scrollStrip} ${styles.stripPerspective}`}
+            tabIndex={0}
+            role="region"
+            aria-label="Three steps, scroll horizontally to see all"
+          >
             {STEPS.map((s) => (
               <div key={s.n} className={styles.stepCard} data-tilt>
                 <div className={styles.stepNum}>{s.n}</div>
@@ -372,6 +378,7 @@ export function HomePageContent() {
           </div>
         </div>
       </section>
+      </main>
 
       <footer className={styles.footer}>
         <div className={`${styles.wrap} ${styles.footInner}`}>

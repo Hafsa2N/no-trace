@@ -102,7 +102,7 @@ export default async function AdminLayout({ children }: LayoutProps<"/admin">) {
           shrink below that content's natural width — the classic flexbox
           "min-width: auto" blowout — and pushes the whole page wider than
           the viewport instead of letting `truncate` do its job. */}
-      <div className="min-w-0 flex-1">{children}</div>
+      <main className="min-w-0 flex-1">{children}</main>
     </div>
   );
 }
