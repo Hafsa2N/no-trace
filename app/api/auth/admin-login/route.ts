@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { sql } from "@/lib/db";
 import { signAdminSession, ADMIN_COOKIE_NAME } from "@/lib/auth";
+import { deriveCsrfToken, CSRF_COOKIE_NAME } from "@/lib/csrf";
 import { withErrors } from "@/lib/api";
 import { checkRateLimit, clientIp, RATE_LIMIT_MESSAGE } from "@/lib/rateLimit";
 import { logAction } from "@/lib/audit";
@@ -51,6 +52,17 @@ export const POST = withErrors(async (req: NextRequest) => {
   const res = NextResponse.json({ ok: true, role: admin.role });
   res.cookies.set(ADMIN_COOKIE_NAME, token, {
     httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    maxAge: 60 * 60 * 12,
+  });
+  // Readable by client JS on purpose — the double-submit-cookie pattern
+  // requires the page to read this value and echo it back as a header,
+  // which a cross-site attacker cannot do (different origin, no way to
+  // read this cookie or attach a custom header via a plain form).
+  res.cookies.set(CSRF_COOKIE_NAME, deriveCsrfToken(token), {
+    httpOnly: false,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",

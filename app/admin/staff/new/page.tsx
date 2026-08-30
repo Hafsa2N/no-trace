@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { Field, Input, Select } from "@/components/ui/Input";
 import { PasswordInput } from "@/components/ui/PasswordInput";
 import { Alert } from "@/components/ui/Alert";
+import { csrfHeaders } from "@/lib/csrf-client";
 
 export default function NewStaffPage() {
   const router = useRouter();
@@ -23,7 +24,7 @@ export default function NewStaffPage() {
     setSubmitting(true);
     const res = await fetch("/api/staff", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...csrfHeaders() },
       body: JSON.stringify({ email, password, role, name }),
     });
     const data = await res.json();

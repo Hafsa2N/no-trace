@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { EyeOff, RotateCw } from "lucide-react";
 import { Card, CardBody } from "@/components/ui/Card";
+import { csrfHeaders } from "@/lib/csrf-client";
 
 export function ModeratedComment({ id, text }: { id: string; text: string }) {
   const router = useRouter();
@@ -14,7 +15,7 @@ export function ModeratedComment({ id, text }: { id: string; text: string }) {
     setHiding(true);
     await fetch(`/api/responses/${id}/moderate`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...csrfHeaders() },
       body: JSON.stringify({ hidden: true }),
     });
     router.refresh();

@@ -9,6 +9,7 @@ import { Field, Input, Select } from "@/components/ui/Input";
 import { Alert } from "@/components/ui/Alert";
 import { Badge } from "@/components/ui/Badge";
 import { QUESTION_TEMPLATES, COMMENT_QUESTION, CONSTRUCT_TEMPLATES, slugifyQuestionId, type SessionQuestion } from "@/lib/questionTemplates";
+import { csrfHeaders } from "@/lib/csrf-client";
 
 type Staff = { id: string; email: string; name: string | null; role: "admin" | "faculty" };
 type Term = { id: string; name: string; starts_at: string; ends_at: string };
@@ -215,7 +216,7 @@ export default function NewSessionPage() {
     setSubmitting(true);
     const res = await fetch("/api/sessions", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...csrfHeaders() },
       body: JSON.stringify({
         department,
         year,

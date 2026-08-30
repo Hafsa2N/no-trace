@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { csrfHeaders } from "@/lib/csrf-client";
 
 export function DeleteSessionButton({ sessionId }: { sessionId: string }) {
   const router = useRouter();
@@ -14,7 +15,7 @@ export function DeleteSessionButton({ sessionId }: { sessionId: string }) {
   async function confirmDelete() {
     setDeleting(true);
     setError("");
-    const res = await fetch(`/api/sessions/${sessionId}`, { method: "DELETE" });
+    const res = await fetch(`/api/sessions/${sessionId}`, { method: "DELETE", headers: csrfHeaders() });
     const data = await res.json();
     setDeleting(false);
     if (!res.ok) {

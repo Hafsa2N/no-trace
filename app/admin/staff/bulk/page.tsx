@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { Alert } from "@/components/ui/Alert";
 import { Badge } from "@/components/ui/Badge";
 import { CopyButton } from "@/components/CopyButton";
+import { csrfHeaders } from "@/lib/csrf-client";
 
 type CreatedRow = { email: string; role: string; tempPassword: string };
 type SkippedRow = { row: number; email: string; reason: string };
@@ -37,7 +38,7 @@ export default function BulkStaffUploadPage() {
     setSubmitting(true);
     const form = new FormData();
     form.append("file", file);
-    const res = await fetch("/api/staff/bulk", { method: "POST", body: form });
+    const res = await fetch("/api/staff/bulk", { method: "POST", headers: csrfHeaders(), body: form });
     const data = await res.json();
     setSubmitting(false);
     if (!res.ok) {

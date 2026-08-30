@@ -8,6 +8,7 @@ import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
+import { csrfHeaders } from "@/lib/csrf-client";
 
 type StaffRow = { id: string; email: string; name: string | null; role: "admin" | "faculty"; is_active: boolean; created_at: string };
 
@@ -37,7 +38,7 @@ export function StaffListClient({ staff, currentUserId }: { staff: StaffRow[]; c
     setRowError(null);
     const res = await fetch(`/api/staff/${id}`, {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...csrfHeaders() },
       body: JSON.stringify({ name: nameDraft }),
     });
     const data = await res.json();
@@ -55,7 +56,7 @@ export function StaffListClient({ staff, currentUserId }: { staff: StaffRow[]; c
     setRowError(null);
     const res = await fetch(`/api/staff/${id}`, {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...csrfHeaders() },
       body: JSON.stringify({ active }),
     });
     const data = await res.json();
@@ -83,7 +84,7 @@ export function StaffListClient({ staff, currentUserId }: { staff: StaffRow[]; c
     setRowError(null);
     const res = await fetch(`/api/staff/${id}`, {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...csrfHeaders() },
       body: JSON.stringify({ newPassword }),
     });
     const data = await res.json();

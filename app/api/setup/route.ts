@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { sql } from "@/lib/db";
 import { signAdminSession, ADMIN_COOKIE_NAME } from "@/lib/auth";
+import { deriveCsrfToken, CSRF_COOKIE_NAME } from "@/lib/csrf";
 import { withErrors } from "@/lib/api";
 
 // Bootstraps the very first admin account for a fresh deployment — the
@@ -41,6 +42,13 @@ export const POST = withErrors(async (req: NextRequest) => {
   const res = NextResponse.json({ ok: true });
   res.cookies.set(ADMIN_COOKIE_NAME, token, {
     httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    maxAge: 60 * 60 * 12,
+  });
+  res.cookies.set(CSRF_COOKIE_NAME, deriveCsrfToken(token), {
+    httpOnly: false,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",

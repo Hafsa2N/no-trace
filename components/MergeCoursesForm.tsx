@@ -7,6 +7,7 @@ import { Card, CardBody } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Field, Select } from "@/components/ui/Input";
 import { Alert } from "@/components/ui/Alert";
+import { csrfHeaders } from "@/lib/csrf-client";
 
 type Course = { id: string; name: string; department: string };
 
@@ -33,7 +34,7 @@ export function MergeCoursesForm({ courses }: { courses: Course[] }) {
     setSubmitting(true);
     const res = await fetch("/api/courses/merge", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...csrfHeaders() },
       body: JSON.stringify({ sourceId, targetId }),
     });
     const data = await res.json();

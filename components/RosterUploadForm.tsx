@@ -6,6 +6,7 @@ import { FileSpreadsheet, UploadCloud } from "lucide-react";
 import { Card, CardBody } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Alert } from "@/components/ui/Alert";
+import { csrfHeaders } from "@/lib/csrf-client";
 
 export function RosterUploadForm() {
   const router = useRouter();
@@ -31,7 +32,7 @@ export function RosterUploadForm() {
     setSubmitting(true);
     const form = new FormData();
     form.append("file", file);
-    const res = await fetch("/api/roster/upload", { method: "POST", body: form });
+    const res = await fetch("/api/roster/upload", { method: "POST", headers: csrfHeaders(), body: form });
     const data = await res.json();
     setSubmitting(false);
     if (!res.ok) {

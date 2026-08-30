@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Send, Undo2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { csrfHeaders } from "@/lib/csrf-client";
 
 export function PublishResultsButton({ offeringId, published }: { offeringId: string; published: boolean }) {
   const router = useRouter();
@@ -15,7 +16,7 @@ export function PublishResultsButton({ offeringId, published }: { offeringId: st
     setError("");
     const res = await fetch(`/api/offerings/${offeringId}/publish`, {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...csrfHeaders() },
       body: JSON.stringify({ published: !published }),
     });
     const data = await res.json();

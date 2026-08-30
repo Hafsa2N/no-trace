@@ -6,6 +6,7 @@ import { Card, CardBody } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Field, Input, Select, Textarea } from "@/components/ui/Input";
 import { Alert } from "@/components/ui/Alert";
+import { csrfHeaders } from "@/lib/csrf-client";
 
 type Course = { id: string; name: string; department: string };
 
@@ -37,7 +38,7 @@ export default function NewUpdatePage() {
     setSubmitting(true);
     const res = await fetch("/api/updates", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...csrfHeaders() },
       body: JSON.stringify({ title, body, department: department || null, courseId: courseId || null }),
     });
     const data = await res.json();

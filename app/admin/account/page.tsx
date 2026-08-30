@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { Field } from "@/components/ui/Input";
 import { PasswordInput } from "@/components/ui/PasswordInput";
 import { Alert } from "@/components/ui/Alert";
+import { csrfHeaders } from "@/lib/csrf-client";
 
 export default function AccountPage() {
   const [currentPassword, setCurrentPassword] = useState("");
@@ -27,7 +28,7 @@ export default function AccountPage() {
     setSubmitting(true);
     const res = await fetch("/api/auth/change-password", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...csrfHeaders() },
       body: JSON.stringify({ currentPassword, newPassword }),
     });
     const data = await res.json();

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronDown, ChevronRight, RotateCw, Eye } from "lucide-react";
 import { Card, CardBody } from "@/components/ui/Card";
+import { csrfHeaders } from "@/lib/csrf-client";
 
 function UnhideRow({ id, text }: { id: string; text: string }) {
   const router = useRouter();
@@ -13,7 +14,7 @@ function UnhideRow({ id, text }: { id: string; text: string }) {
     setUnhiding(true);
     await fetch(`/api/responses/${id}/moderate`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...csrfHeaders() },
       body: JSON.stringify({ hidden: false }),
     });
     router.refresh();
