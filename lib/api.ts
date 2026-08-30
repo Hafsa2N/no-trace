@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { logError } from "@/lib/logger";
 
 /**
  * Every route handler is wrapped in this so an unexpected throw (DB
@@ -13,8 +14,11 @@ export function withErrors<Args extends unknown[]>(
     try {
       return await handler(...args);
     } catch (err) {
-      console.error(err);
-      return NextResponse.json({ error: "Something went wrong. Please try again." }, { status: 500 });
+      const errorId = logError(err);
+      return NextResponse.json(
+        { error: "Something went wrong. Please try again.", errorId },
+        { status: 500 }
+      );
     }
   };
 }
