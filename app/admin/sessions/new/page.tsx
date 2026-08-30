@@ -57,6 +57,11 @@ export default function NewSessionPage() {
 
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  // Generated once per mount of this form, not per submit attempt — a
+  // double-click or a retried request during the same attempt reuses this
+  // key so the server can recognize and collapse the duplicate (Idempotency-
+  // Key header, checked in app/api/sessions/route.ts).
+  const [idempotencyKey] = useState(() => crypto.randomUUID());
 
   const suggestedRemaining = QUESTION_TEMPLATES.filter((t) => !questions.some((q) => q.id === t.id));
   const hasTextQuestion = questions.some((q) => q.type === "text");
@@ -216,7 +221,7 @@ export default function NewSessionPage() {
     setSubmitting(true);
     const res = await fetch("/api/sessions", {
       method: "POST",
-      headers: { "Content-Type": "application/json", ...csrfHeaders() },
+      headers: { "Content-Type": "application/json", "Idempotency-Key": idempotencyKey, ...csrfHeaders() },
       body: JSON.stringify({
         department,
         year,

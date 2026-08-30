@@ -223,6 +223,20 @@ create table rate_limit_hits (
   created_at timestamptz not null default now()
 );
 
+-- Idempotency for admin-side mutations that create a resource (currently:
+-- POST /api/sessions). The client generates the key once per form instance
+-- and resends it on every attempt of the same submit; `key` is claimed
+-- atomically (see lib/idempotency.ts) so a double-click or a retried
+-- network request replays the first response instead of creating a second
+-- row. `response_body` is null while the original request is still being
+-- processed, and filled in once it completes.
+create table idempotency_keys (
+  key           text primary key,
+  admin_id      uuid not null references admins(id),
+  response_body jsonb,
+  created_at    timestamptz not null default now()
+);
+
 create index on staff_reset_codes (admin_id);
 create index on otp_codes (session_id, roll_number);
 create index on session_offerings (session_id);
